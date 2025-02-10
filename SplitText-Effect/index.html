@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Split text</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&display=swap" rel="stylesheet">
+  <style>
+    html,
+    body {
+      width: 100vw;
+      height: 100%;
+      min-height: calc(100vh - 60px);
+      background: 
+        linear-gradient(to right, rgba(67, 66, 66, 0.5) 1px, rgb(33, 33, 33, 0.5) 1px),
+        linear-gradient(to top, rgba(90, 90, 90, 0.5) 1px, rgb(33, 33, 33, 0.5) 1px);
+      background-size: 80px 80px; /* Grid cell size */
+      background-position: top left; /* Ensure the grid starts from the top-left */
+
+      color: white;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    .split-con {
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .split-text {
+      font-size: 2rem;
+      font-weight: bold;
+      font-family: sans-serif;
+      color: white;
+      text-align: center;
+    }
+
+    .char {
+      display: inline-block;
+    }
+    .alfa-slab-one-regular {
+      font-family: "Alfa Slab One", serif;
+      font-weight: 400;
+      font-style: normal;
+      letter-spacing: 2px;
+    }
+
+  </style>
+</head>
+
+<body>
+  <div class="split-con">
+    <div id="split-text-el" class="split-text alfa-slab-one-regular">
+      Moradium
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script>
+    const splitEl = document.getElementById("split-text-el");
+    const wrappedText = splitEl.textContent
+      .trim()
+      .split("")
+      .map(char => char === " " ? "&nbsp;" : `<span class="char">${char}</span>`)
+      .join("");
+
+    splitEl.innerHTML = wrappedText;
+
+    gsap.set(".char", {
+      y: 20,
+      opacity: 0,
+      position: "relative"
+    });
+
+    gsap.to(".char", {
+      opacity: 1,
+      y: -10,
+      duration: 0.3,
+      stagger: 0.1,
+      ease: "spring"
+    }
+    );
+  </script>
+</body>
+
+</html>
