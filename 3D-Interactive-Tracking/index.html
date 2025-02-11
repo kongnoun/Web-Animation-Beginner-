@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Tilt Effect</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <style>
+    /* General Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #0e0e0e;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    .parent {
+      position: relative;
+      width: 300px;
+      height: 400px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      perspective: 1000px;
+      /* 3D effect */
+      transition: transform 0.3s ease-out;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .child {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      background: rgba(255, 0, 0, 0.8);
+      border-radius: 10px;
+      transition: transform 0.3s ease-out;
+      will-change: transform;
+    }
+
+    /* Additional Child Elements */
+    .child:nth-child(2) {
+      background: rgba(0, 255, 0, 0.8);
+      width: 60px;
+      height: 60px;
+    }
+
+    .child:nth-child(3) {
+      background: rgba(0, 0, 255, 0.8);
+      width: 40px;
+      height: 40px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="parent">
+    <div class="child"></div>
+    <div class="child"></div>
+    <div class="child"></div>
+  </div>
+
+  <script>
+    const parent = document.querySelector('.parent');
+    const children = document.querySelectorAll('.child');
+
+    parent.addEventListener("mousemove", (event) => {
+      const rect = parent.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+
+      // Calculate rotation angles
+      const rotateX = (y / rect.height - 0.5) * 20; // Tilt up/down
+      const rotateY = (x / rect.width - 0.5) * -20; // Tilt left/right
+
+      // Apply 3D rotation to parent
+      gsap.to(parent, {
+        rotationX: rotateX,
+        rotationY: rotateY,
+        transformPerspective: 1000,
+        transformOrigin: "center",
+        ease: "power2.out",
+        duration: 0.3
+      });
+
+      // Add slight movement to child elements
+      children.forEach((child, index) => {
+        const depthFactor = (index + 1) * 5;
+        gsap.to(child, {
+          x: (x - rect.width / 2) / depthFactor,
+          y: (y - rect.height / 2) / depthFactor,
+          duration: 0.3,
+          ease: "power2.out"
+        });
+      });
+    });
+
+    // Reset effect when cursor leaves
+    parent.addEventListener("mouseleave", () => {
+      gsap.to(parent, { rotationX: 0, rotationY: 0, duration: 0.5, ease: "power2.out" });
+      gsap.to(children, { x: 0, y: 0, duration: 0.5, ease: "power2.out" });
+    });
+  </script>
+
+</body>
+
+</html>
