@@ -26,8 +26,8 @@
 
     .parent {
       position: relative;
-      width: 300px;
-      height: 400px;
+      width: 700px;
+      height: 700px;
       background: rgba(255, 255, 255, 0.1);
       border-radius: 20px;
       display: flex;
@@ -45,6 +45,7 @@
       width: 80px;
       height: 80px;
       background: rgba(255, 0, 0, 0.8);
+
       border-radius: 10px;
       transition: transform 0.3s ease-out;
       will-change: transform;
@@ -82,12 +83,12 @@
       const x = event.clientX - rect.left;
       const y = event.clientY - rect.top;
 
-      // Calculate rotation angles
+      // Calculate rotation angles for tilt effect
       const rotateX = (y / rect.height - 0.5) * 20; // Tilt up/down
       const rotateY = (x / rect.width - 0.5) * -20; // Tilt left/right
 
       // Apply 3D rotation to parent
-      gsap.to(parent, {
+      gsap.to(children, {
         rotationX: rotateX,
         rotationY: rotateY,
         transformPerspective: 1000,
@@ -96,14 +97,17 @@
         duration: 0.3
       });
 
-      // Add slight movement to child elements
+      // Animate child elements
       children.forEach((child, index) => {
-        const depthFactor = (index + 1) * 5;
+        const depthFactor = (index + 1) * 5; // Depth effect scaling
+        const shadowFactor = (index + 1) * 5; // Shadow depth scaling
+
         gsap.to(child, {
           x: (x - rect.width / 2) / depthFactor,
           y: (y - rect.height / 2) / depthFactor,
           duration: 0.3,
-          ease: "power2.out"
+          ease: "power2.out",
+          boxShadow: `${-shadowFactor}px ${shadowFactor}px 15px rgba(255, 255, 255, 0.3)`
         });
       });
     });
@@ -111,9 +115,16 @@
     // Reset effect when cursor leaves
     parent.addEventListener("mouseleave", () => {
       gsap.to(parent, { rotationX: 0, rotationY: 0, duration: 0.5, ease: "power2.out" });
-      gsap.to(children, { x: 0, y: 0, duration: 0.5, ease: "power2.out" });
+      gsap.to(children, {
+        x: 0,
+        y: 0,
+        duration: 0.5,
+        ease: "power2.out",
+        boxShadow: "0px 0px 10px rgba(255, 255, 255, 0.5)"
+      });
     });
   </script>
+
 
 </body>
 
