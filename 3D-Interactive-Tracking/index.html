@@ -16,12 +16,15 @@
 
     body {
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
       background: #0e0e0e;
       font-family: Arial, sans-serif;
-      overflow: hidden;
+      overflow-x: hidden;
+      gap: 20px;
+      
     }
 
     .parent {
@@ -63,6 +66,34 @@
       width: 40px;
       height: 40px;
     }
+
+    .parent-demo {
+      position: relative;
+      width: 700px;
+      height: 700px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      perspective: 1000px;
+      /* 3D effect */
+      transition: transform 0.3s ease-out;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .child-demo {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      background: rgba(255, 0, 0, 0.6);
+      box-shadow: 0 0 1rem rgba(204, 13, 13, 0.2);
+
+      border-radius: 10px;
+      transition: transform 0.3s ease-out;
+      will-change: transform;
+    }
   </style>
 </head>
 
@@ -74,55 +105,92 @@
     <div class="child"></div>
   </div>
 
+  <div class="parent-demo">
+    <div class="child-demo"></div>
+    <div class="child-demo"></div>
+    <div class="child-demo"></div>
+    <div class="child-demo"></div>
+    <div class="child-demo"></div>
+    <div class="child-demo"></div>
+  </div>
   <script>
-    const parent = document.querySelector('.parent');
-    const children = document.querySelectorAll('.child');
 
-    parent.addEventListener("mousemove", (event) => {
-      const rect = parent.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
+    const parent = document.querySelector(".parent");
+    const children = document.querySelectorAll(".child");
 
-      // Calculate rotation angles for tilt effect
-      const rotateX = (y / rect.height - 0.5) * 20; // Tilt up/down
-      const rotateY = (x / rect.width - 0.5) * -20; // Tilt left/right
+    const parentDemo = document.querySelector(".parent-demo");
+    const childrenDemo = document.querySelectorAll(".child-demo");
 
-      // Apply 3D rotation to parent
-      gsap.to(children, {
-        rotationX: rotateX,
-        rotationY: rotateY,
-        transformPerspective: 1000,
-        transformOrigin: "center",
-        ease: "power2.out",
-        duration: 0.3
-      });
+    parentDemo.addEventListener("mousemove", (event) => {
+        const rect = parentDemo.getBoundingClientRect();
+        const userX = event.clientX - rect.left;
+        const userY = event.clientY - rect.top;
 
-      // Animate child elements
-      children.forEach((child, index) => {
-        const depthFactor = (index + 1) * 5; // Depth effect scaling
-        const shadowFactor = (index + 1) * 5; // Shadow depth scaling
+        const rotateX = (userY / rect.height - 0.5) * 20;
+        const rotateY = (userX / rect.width - 0.5) * -20;
 
-        gsap.to(child, {
-          x: (x - rect.width / 2) / depthFactor,
-          y: (y - rect.height / 2) / depthFactor,
-          duration: 0.3,
-          ease: "power2.out",
-          boxShadow: `${-shadowFactor}px ${shadowFactor}px 15px rgba(255, 255, 255, 0.3)`
+        childrenDemo.forEach((child, index) => {
+          const depthFactor = (index + 1) * 5;
+          const shadowFactor = (index + 1) * 5;
+
+          gsap.to(child, {
+            x: (userX - rect.width / 2) / depthFactor,
+            y: (userY - rect.height / 2) / depthFactor,
+            duration: 0.3,
+            ease: "power2.out",
+            boxShadow: `${-shadowFactor}px ${shadowFactor}px 15px rgba(255, 255, 255, 0.4)`,
+          });
         });
       });
-    });
 
-    // Reset effect when cursor leaves
-    parent.addEventListener("mouseleave", () => {
-      gsap.to(parent, { rotationX: 0, rotationY: 0, duration: 0.5, ease: "power2.out" });
-      gsap.to(children, {
-        x: 0,
-        y: 0,
-        duration: 0.5,
-        ease: "power2.out",
-        boxShadow: "0px 0px 10px rgba(255, 255, 255, 0.5)"
+      parentDemo.addEventListener("mouseleave", () => {
+
+        gsap.to(childrenDemo, {
+          x: 0,
+          y: 0,
+          duration: 0.5,
+          ease: "power2.out",
+          boxShadow: "0px 0px 10px rgba(255, 255, 255, 0.5)"
+        });
       });
-    });
+
+
+      parent.addEventListener("mousemove", (event) => {
+          const rect = parent.getBoundingClientRect();
+          const userX = event.clientX - rect.left;
+          const userY = event.clientY - rect.top;
+
+          const rotateX = (userY / rect.height - 0.5) * 20;
+          const rotateY = (userX / rect.width - 0.5) * -20;
+
+          // Apply tilt effect to parent container
+
+          // Apply depth effect to children
+          children.forEach((child, index) => {
+            const depthFactor = (index + 1) * 5;
+            const shadowFactor = (index - 1) * 5;
+
+            gsap.to(child, {
+              x: (userX - rect.width / 2) / depthFactor,
+              y: (userY - rect.height / 2) / depthFactor,
+              duration: 0.3,
+              ease: "power2.out",
+              boxShadow: `${-shadowFactor}px ${shadowFactor}px 15px rgba(255, 255, 255, 0.3)`,
+            });
+          });
+        });
+
+        parent.addEventListener("mouseleave", () => {
+
+          gsap.to(children, {
+            x: 0,
+            y: 0,
+            duration: 0.5,
+            ease: "power2.out",
+            boxShadow: "0px 0px 10px rgba(255, 255, 255, 0.5)"
+          });
+        });
+
   </script>
 
 
