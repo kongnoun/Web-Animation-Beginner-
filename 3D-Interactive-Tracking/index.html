@@ -7,7 +7,12 @@
   <title>3D Tilt Effect</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <style>
-    /* General Styles */
+    :root {
+      --container-size: 700px;
+      --container-bg: rgba(255, 255, 255, 0.1);
+      --shadow-color: rgba(255, 255, 255, 0.4);
+    }
+
     * {
       margin: 0;
       padding: 0;
@@ -24,176 +29,204 @@
       font-family: Arial, sans-serif;
       overflow-x: hidden;
       gap: 20px;
-      
     }
 
-    .parent {
+    .container {
       position: relative;
-      width: 700px;
-      height: 700px;
-      background: rgba(255, 255, 255, 0.1);
+      width: var(--container-size);
+      height: var(--container-size);
+      background: var(--container-bg);
       border-radius: 20px;
       display: flex;
       justify-content: center;
       align-items: center;
       overflow: hidden;
       perspective: 1000px;
-      /* 3D effect */
       transition: transform 0.3s ease-out;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     }
 
-    .child {
+    .tilt-child {
       position: absolute;
-      width: 80px;
-      height: 80px;
-      background: rgba(255, 0, 0, 0.8);
-
       border-radius: 10px;
       transition: transform 0.3s ease-out;
       will-change: transform;
     }
 
-    /* Additional Child Elements */
-    .child:nth-child(2) {
-      background: rgba(0, 255, 0, 0.8);
+    .basic-children .tilt-child {
+      background: rgba(255, 0, 0, 0.8);
+    }
+
+    .basic-children .tilt-child:nth-child(1) {
+      width: 80px;
+      height: 80px;
+    }
+
+    .basic-children .tilt-child:nth-child(2) {
       width: 60px;
       height: 60px;
+      background: rgba(0, 255, 0, 0.8);
     }
 
-    .child:nth-child(3) {
-      background: rgba(0, 0, 255, 0.8);
+    .basic-children .tilt-child:nth-child(3) {
       width: 40px;
       height: 40px;
+      background: rgba(0, 0, 255, 0.8);
     }
 
-    .parent-demo {
-      position: relative;
-      width: 700px;
-      height: 700px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 20px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
-      perspective: 1000px;
-      /* 3D effect */
-      transition: transform 0.3s ease-out;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    }
-
-    .child-demo {
-      position: absolute;
+    .demo-children .tilt-child {
       width: 80px;
       height: 80px;
       background: rgba(255, 0, 0, 0.6);
       box-shadow: 0 0 1rem rgba(204, 13, 13, 0.2);
+    }
 
-      border-radius: 10px;
-      transition: transform 0.3s ease-out;
-      will-change: transform;
+    .cursor-container {
+      cursor: none;
+      /* Hide the default cursor */
+    }
+
+    .follow-child {
+      width: 20px;
+      height: 20px;
+      background-color: blue;
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      /* Ensure it doesn't interfere with events */
+      transform: translate(-50%, -50%);
+      /* Center the cursor */
+      mix-blend-mode: difference;
+      /* Makes it visible on any background */
+      z-index: 1000;
     }
   </style>
 </head>
 
 <body>
-
-  <div class="parent">
-    <div class="child"></div>
-    <div class="child"></div>
-    <div class="child"></div>
+  <div class="container basic-children">
+    <div class="tilt-child"></div>
+    <div class="tilt-child"></div>
+    <div class="tilt-child"></div>
   </div>
 
-  <div class="parent-demo">
-    <div class="child-demo"></div>
-    <div class="child-demo"></div>
-    <div class="child-demo"></div>
-    <div class="child-demo"></div>
-    <div class="child-demo"></div>
-    <div class="child-demo"></div>
+  <div class="container demo-children">
+    <div class="tilt-child"></div>
+    <div class="tilt-child"></div>
+    <div class="tilt-child"></div>
+    <div class="tilt-child"></div>
+    <div class="tilt-child"></div>
+    <div class="tilt-child"></div>
   </div>
+
+  <div class="container cursor-container" style="margin-bottom: 200px;">
+    <div class="follow-child"></div>
+  </div>
+
   <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Utility functions
+      const calculateOffset = (event, element) => {
+        const rect = element.getBoundingClientRect();
+        return {
+          x: event.clientX - rect.left,
+          y: event.clientY - rect.top,
+          rect
+        };
+      };
 
-    const parent = document.querySelector(".parent");
-    const children = document.querySelectorAll(".child");
+      const createTiltEffect = (container, children, options = {}) => {
+        const defaults = {
+          depthFactor: 5,
+          shadowFactor: 5,
+          duration: 0.3,
+          returnDuration: 0.5,
+          shadowColor: 'rgba(255, 255, 255, 0.4)',
+          returnShadow: '0px 0px 10px rgba(255, 255, 255, 0.5)'
+        };
+        const settings = { ...defaults, ...options };
 
-    const parentDemo = document.querySelector(".parent-demo");
-    const childrenDemo = document.querySelectorAll(".child-demo");
+        container.addEventListener("mousemove", (event) => {
+          const { x: userX, y: userY, rect } = calculateOffset(event, container);
 
-    parentDemo.addEventListener("mousemove", (event) => {
-        const rect = parentDemo.getBoundingClientRect();
-        const userX = event.clientX - rect.left;
-        const userY = event.clientY - rect.top;
-
-        const rotateX = (userY / rect.height - 0.5) * 20;
-        const rotateY = (userX / rect.width - 0.5) * -20;
-
-        childrenDemo.forEach((child, index) => {
-          const depthFactor = (index + 1) * 5;
-          const shadowFactor = (index + 1) * 5;
-
-          gsap.to(child, {
-            x: (userX - rect.width / 2) / depthFactor,
-            y: (userY - rect.height / 2) / depthFactor,
-            duration: 0.3,
-            ease: "power2.out",
-            boxShadow: `${-shadowFactor}px ${shadowFactor}px 15px rgba(255, 255, 255, 0.4)`,
-          });
-        });
-      });
-
-      parentDemo.addEventListener("mouseleave", () => {
-
-        gsap.to(childrenDemo, {
-          x: 0,
-          y: 0,
-          duration: 0.5,
-          ease: "power2.out",
-          boxShadow: "0px 0px 10px rgba(255, 255, 255, 0.5)"
-        });
-      });
-
-
-      parent.addEventListener("mousemove", (event) => {
-          const rect = parent.getBoundingClientRect();
-          const userX = event.clientX - rect.left;
-          const userY = event.clientY - rect.top;
-
-          const rotateX = (userY / rect.height - 0.5) * 20;
-          const rotateY = (userX / rect.width - 0.5) * -20;
-
-          // Apply tilt effect to parent container
-
-          // Apply depth effect to children
           children.forEach((child, index) => {
-            const depthFactor = (index + 1) * 5;
-            const shadowFactor = (index - 1) * 5;
+            const depth = (index + 1) * settings.depthFactor;
+            const shadow = (index + 1) * settings.shadowFactor;
 
             gsap.to(child, {
-              x: (userX - rect.width / 2) / depthFactor,
-              y: (userY - rect.height / 2) / depthFactor,
-              duration: 0.3,
+              x: (userX - rect.width / 2) / depth,
+              y: (userY - rect.height / 2) / depth,
+              duration: settings.duration,
               ease: "power2.out",
-              boxShadow: `${-shadowFactor}px ${shadowFactor}px 15px rgba(255, 255, 255, 0.3)`,
+              boxShadow: `${-shadow}px ${shadow}px 15px ${settings.shadowColor}`
             });
           });
         });
 
-        parent.addEventListener("mouseleave", () => {
-
+        container.addEventListener("mouseleave", () => {
           gsap.to(children, {
             x: 0,
             y: 0,
-            duration: 0.5,
+            duration: settings.returnDuration,
             ease: "power2.out",
-            boxShadow: "0px 0px 10px rgba(255, 255, 255, 0.5)"
+            boxShadow: settings.returnShadow
           });
         });
+      };
 
+      const createCustomCursor = (container, cursor) => {
+        let isInside = false;
+
+        const updateCursorPosition = (event) => {
+          if (!isInside) return;
+
+          const { x, y } = calculateOffset(event, container);
+
+          gsap.to(cursor, {
+            x,
+            y,
+            duration: 0.1,
+            ease: "power1.out"
+          });
+        };
+
+        container.addEventListener("mouseenter", (event) => {
+          isInside = true;
+          cursor.style.opacity = 1;
+          updateCursorPosition(event);
+        });
+
+        container.addEventListener("mousemove", updateCursorPosition);
+
+        container.addEventListener("mouseleave", () => {
+          isInside = false;
+          cursor.style.opacity = 0;
+        });
+      };
+
+      // Initialize effects
+      const containers = document.querySelectorAll('.container');
+
+      // Basic tilt effect
+      createTiltEffect(
+        containers[0],
+        containers[0].querySelectorAll('.tilt-child')
+      );
+
+      // Demo tilt effect
+      createTiltEffect(
+        containers[1],
+        containers[1].querySelectorAll('.tilt-child'),
+        { shadowColor: 'rgba(255, 255, 255, 0.6)' }
+      );
+
+      // Custom cursor effect
+      createCustomCursor(
+        containers[2],
+        containers[2].querySelector('.follow-child')
+      );
+    });
   </script>
-
-
 </body>
 
 </html>
