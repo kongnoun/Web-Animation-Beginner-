@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Grid Animation</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <style>
     body {
       margin: 0;
@@ -20,39 +21,20 @@
     }
 
     body > #parent-ct {
-      width: 800px;
-      height: 800px;
-      border: 10px solid #fff;
+      width: 1000px;
+      height: 1000px;
+      border: 10px solid #000;
       border-radius: 0.25rem;	
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
     }
   </style>
 </head>
 <body>
-  <div id="parent-ct">
-  </div>
-
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const parent = document.getElementById("parent-ct");
-      const gridAmount = () =>{
-        for (let i = 0; i < 10; i++) {
-          const child = document.createElement("div");
-          child.classlist.add("grid-child");
-          parent.appendChild(child);
-        }
-      }
-
-      const calculateOffset = (event, parent) => {
-        const rect = parent.getBoundingClientRect();
-        // Add a 10px offset
-        return {
-          x: event.clientX - rect.left + 10,
-          y: event.clientY - rect.top + 10, 
-          rect
-        };
-      };
-
-    });
-  </script>
+  <div id="parent-ct"></div>
+  <script src="./script.js"></script>
 </body>
 </html>
