@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Split Text 2</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  <style>
+  body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+    color: #fff;
+    background:
+        linear-gradient(to right, black, rgb(33, 33, 33, 0.5) 1px),
+        linear-gradient(to top, black, rgb(33, 33, 33, 0.5) 1px);
+    background-size: 70px 70px;
+    background-size: 0 0 70px 70px;
+    background-position: top left;
+  }
+  </style>
+</head>
+<body class="flex justify-center items-center">
+  <div id="text-el"></div>
+  <script>
+    const textEl = document.getElementById("text-el");
+    const word = "Moradium";
+    textEl.append(...word.split("").map(char => {
+      const span = document.createElement("span");
+      span.style.display = "inline-block";
+      span.style.color = "white";
+      span.style.fontSize = "3rem";
+      span.style.fontWeight = "bold";
+      span.style.fontFamily = "sans-serif";
+      span.style.letterSpacing = "2px";
+      span.textContent = char;
+
+      gsap.set(span, {
+        x: gsap.utils.random(-100, 100, 10, true),
+        y: gsap.utils.random(-100, 100, 10, true),
+        rotation: gsap.utils.random(-360, 360),
+        scale: gsap.utils.random(0.5, 2)
+      });
+
+      gsap.to(span, {
+        duration: 4,
+        x: gsap.utils.random(-100, 100, 10, true),
+        y: gsap.utils.random(-100, 100, 10, true),
+        scale: gsap.utils.random(2, 2),
+        rotation: gsap.utils.random(-360, 360),
+        repeat: -1,
+        yoyo: true,
+        ease: "power1.inOut"
+      });
+      return span;
+    }));
+
+  </script>
+</body>
+</html>
