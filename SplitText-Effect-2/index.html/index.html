@@ -27,7 +27,30 @@
   <div id="text-el"></div>
   <script>
     const textEl = document.getElementById("text-el");
-    const word = "Moradium";
+    const word = "Moradium🌩️🌩️";
+    function hoverEffect() {
+      textEl.addEventListener("mouseover", () => {
+        gsap.to(textEl.children, {
+          duration: 1,
+          x: gsap.utils.random(-100, 100, 10, true),
+          y: gsap.utils.random(-100, 100, 10, true),
+          scale: gsap.utils.random(2, 2),
+          rotation: gsap.utils.random(-360, 360),
+          ease: "power1.inOut",
+          onComplete: () => {
+            gsap.to(textEl.children, {
+              duration: 1,
+              x: 0,
+              y: 0,
+              rotation: 0,
+              scale: 1,
+              ease: "power1.inOut",
+              color: `hsl(${gsap.utils.random(0, 360)}, 100%, 50%)`,
+            });
+          }
+        });
+      });
+    }
     textEl.append(...word.split("").map(char => {
       const span = document.createElement("span");
       span.style.display = "inline-block";
@@ -39,21 +62,35 @@
       span.textContent = char;
 
       gsap.set(span, {
-        x: gsap.utils.random(-100, 100, 10, true),
-        y: gsap.utils.random(-100, 100, 10, true),
-        rotation: gsap.utils.random(-360, 360),
-        scale: gsap.utils.random(0.5, 2)
+        x: 0,
+        y: 0,
+        rotation: 0,
+        scale: 1,
+        transformOrigin: "50% 50%"
       });
 
       gsap.to(span, {
-        duration: 4,
+        duration: 2,
         x: gsap.utils.random(-100, 100, 10, true),
         y: gsap.utils.random(-100, 100, 10, true),
         scale: gsap.utils.random(2, 2),
         rotation: gsap.utils.random(-360, 360),
         repeat: -1,
         yoyo: true,
-        ease: "power1.inOut"
+        ease: "power1.inOut",
+        onComplete: () => {
+          gsap.to(span, {
+            duration: 2,
+            x: 0,
+            y: 0,
+            rotation: 0,
+            scale: 1,
+            ease: "power1.inOut",
+            repeat: -1,
+            color: `hsl(${gsap.utils.random(0, 360)}, 100%, 50%)`,
+          });
+          
+        }
       });
       return span;
     }));
