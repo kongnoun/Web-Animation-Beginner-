@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carousel-Slider</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      width: 100%;
+      font-family: Arial, sans-serif;
+      color: #fff;
+      background:
+        linear-gradient(to right, black, rgba(0, 0, 0, 0.65) 1px),
+        linear-gradient(to bottom, black, rgba(0, 0, 0, 0.65) 1px);
+      background-size: 100px 100px;
+      background-position: top left;
+    }
+
+    .carousel-container {
+      width: 500px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .carousel {
+      display: flex;
+      gap: 20px;
+      width: 500%;
+    }
+
+    .slide {
+      min-width: 100%;
+      transition: transform 0.5s ease-in-out;
+    }
+
+    .controls {
+      position: absolute;
+      top: 50%;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      transform: translateY(-50%);
+    }
+
+    .controls button {
+      background: rgba(255, 255, 255, 0.3);
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 20px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+
+<body class="flex justify-center items-center">
+  <div class="w-[1400px] h-screen flex flex-col justify-center items-center">
+    <h1 class="text-3xl font-bold font-mono mb-5">Carousel Slider</h1>
+
+    <div class="carousel-container">
+      <div id="carousel" class="carousel">
+        <div class="slide">
+          <img class="rounded-xl w-full h-full object-fit" src="img.png" alt="image of an anime girl">
+        </div>
+        <div class="slide">
+          <img class="rounded-xl w-full h-full object-fit" src="img.png" alt="image of an anime girl">
+        </div>
+        <div class="slide">
+          <img class="rounded-xl w-full h-full object-fit" src="img.png" alt="image of an anime girl">
+        </div>
+        <div class="slide">
+          <img class="rounded-xl w-full h-full object-fit" src="img.png" alt="image of an anime girl">
+        </div>
+      </div>
+
+      <div class="controls">
+        <button id="prev">‹</button>
+        <button id="next">›</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let index = 0;
+    const slides = document.querySelectorAll(".slide");
+    const totalSlides = slides.length;
+    const carousel = document.querySelector("#carousel");
+
+    function updateSlide() {
+      gsap.to(carousel, { x: `-${index * 100}%`, duration: 0.7, ease: "power2.inOut" });
+    }
+
+    document.querySelector("#next").addEventListener("click", () => {
+      index = (index + 1) % totalSlides;
+      updateSlide();
+    });
+
+    document.querySelector("#prev").addEventListener("click", () => {
+      index = (index - 1 + totalSlides) % totalSlides;
+      updateSlide();
+    });
+  </script>
+</body>
+
+</html>
