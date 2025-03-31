@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carousel-Slider</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #111;
+    }
+
+    .carousel-wrapper {
+      width: 80%;
+      max-width: 800px;
+      position: relative;
+      overflow: hidden;
+      border-radius: 15px;
+    }
+
+    .carousel-container {
+      display: flex;
+      transition: transform 0.5s ease;
+    }
+
+    .carousel__photo {
+      min-width: 100%;
+      height: auto;
+      filter: grayscale(0.3);
+      border: 0px solid rgba(255, 255, 255, 0.3);
+      margin: 0;
+      transition: opacity 0.5s ease, transform 0.5s ease, border 1s ease, filter 0.5s ease, margin 0.7s ease;
+      border-radius: 10px;
+    }
+
+    .carousel__photo:not(.active) {
+      opacity: 0.5;
+      margin: 0;
+      border: 0px solid rgba(255, 255, 255, 0.3);
+      filter: grayscale(0.3);
+      transform: scale(0.7);
+    }
+
+    .carousel__photo.active {
+      opacity: 1;
+      filter: grayscale(0);
+      margin: 3em;
+      transform: scale(1);
+      border: 3px solid rgba(255, 255, 255, 0.5);
+    }
+
+    .carousel__button--next,
+    .carousel__button--prev {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0, 0, 0, 0.5);
+      color: white;
+      border: none;
+      padding: 0.7rem 1rem;
+      font-size: 0.7rem;
+      cursor: pointer;
+      z-index: 100;
+      border-radius: 50%;
+    }
+
+    .carousel__button--next {
+      right: 20px;
+    }
+
+    .carousel__button--prev {
+      left: 20px;
+    }
+
+    .carousel__button--next:hover,
+    .carousel__button--prev:hover {
+      background: rgba(0, 0, 0, 0.7);
+    }
+
+    .carousel-indicators {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%) translateY(-50%);  
+      display: flex;
+      gap: 5px;
+      z-index: 100;
+    }
+
+    .carousel-indicators.active {
+      width: 10px;
+      height: 10px;
+      background-color: rgba(255, 255, 255, 0.5);
+      border-radius: 50%;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Carousel Wrapper -->
+  <div class="carousel-wrapper flex justify-center items-center relative w-[80%] max-w-[800px] overflow-hidden rounded-[15px]">
+    <!-- Carousel Container -->
+    <div class="carousel-container w-70 h-[490px]">
+      <!-- Photos -->
+      <img class="carousel__photo object-fit active" src="./img.png" alt="image">
+      <img class="carousel__photo object-fit" src="./img.png" alt="image">
+      <img class="carousel__photo object-fit" src="./img.png" alt="image">
+      <img class="carousel__photo object-fit" src="./img.png" alt="image">
+      <img class="carousel__photo object-fit" src="./img.png" alt="image">
+    </div>
+
+    <!-- Navigation Buttons -->
+    <button class="carousel__button--prev">&#10094;</button>
+    <button class="carousel__button--next">&#10095;</button>
+
+    <!-- Carousel Indicators -->
+    <div class="carousel__indicators flex justify-center items-center absolute bottom-5 left-0 right-0 space-x-2">
+      <span class="carousel__indicator active">&#9679</span>
+      <span class="carousel__indicator">&#9679</span>
+      <span class="carousel__indicator">&#9679</span>
+      <span class="carousel__indicator">&#9679</span>
+      <span class="carousel__indicator">&#9679</span>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const photos = document.querySelectorAll('.carousel__photo');
+      const nextButton = document.querySelector('.carousel__button--next');
+      const prevButton = document.querySelector('.carousel__button--prev');
+      const carouselContainer = document.querySelector('.carousel-container');
+      let currentIndex = 0;
+
+      function updateCarousel() {
+        // Remove the active class and reset the transform for each photo
+        photos.forEach((photo, index) => {
+          photo.classList.remove('active');
+        });
+        photos[currentIndex].classList.add('active');
+
+        // Move the carousel container to show the current image
+        carouselContainer.style.transform = `translateX(-${currentIndex * 100}%)`;
+      }
+
+      nextButton.addEventListener('click', () => {
+        currentIndex = (currentIndex + 1) % photos.length; // Loop to the first image
+        updateCarousel();
+      });
+
+      prevButton.addEventListener('click', () => {
+        currentIndex = (currentIndex - 1 + photos.length) % photos.length; // Loop to the last image if needed
+        updateCarousel();
+      });
+
+      // Initialize the carousel
+      updateCarousel();
+    });
+  </script>
+
+</body>
+
+</html>
